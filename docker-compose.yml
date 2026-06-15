@@ -20,3 +20,6 @@ services:
       - egestatbot_data:/data
       # Логи доступны снаружи контейнера
       - ./logs:/app/logs
+
+volumes:
+  egestatbot_data:
