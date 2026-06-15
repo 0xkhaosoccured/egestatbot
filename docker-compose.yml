@@ -1,0 +1,22 @@
+services:
+  egestatbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: egestatbot
+    restart: unless-stopped
+
+    # Переменные окружения берутся из .env в той же директории
+    env_file:
+      - .env
+
+    # Переопределяем пути к файлам состояния на volume-пути
+    environment:
+      - COOKIE_FILE=/data/cookie.txt
+      - STATE_FILE=/data/exams_state.json
+
+    volumes:
+      # Постоянное хранилище: cookie и состояние оценок
+      - egestatbot_data:/data
+      # Логи доступны снаружи контейнера
+      - ./logs:/app/logs

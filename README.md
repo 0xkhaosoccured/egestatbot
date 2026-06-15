@@ -178,6 +178,77 @@ pm2 save
 
 ---
 
+## Запуск через Docker
+
+### Требования
+- [Docker](https://docs.docker.com/get-docker/) 20.10+
+- [Docker Compose](https://docs.docker.com/compose/) v2
+
+### Быстрый старт
+
+**1. Подготовьте `.env`:**
+
+```bash
+# Скопируйте пример и заполните BOT_TOKEN и ADMIN_CHAT_ID
+cp .env.example .env
+```
+
+Если `.env.example` отсутствует, создайте `.env` вручную:
+
+```env
+BOT_TOKEN=ваш_токен_бота
+ADMIN_CHAT_ID=ваш_telegram_id
+# GROUP_CHAT_IDS=id1,id2   # опционально
+```
+
+**2. Запустите контейнер:**
+
+```bash
+docker compose up -d
+```
+
+Образ собирается автоматически при первом запуске.
+
+**3. Авторизация на портале (cookie):**
+
+После первого запуска бот пришлёт уведомление в Telegram с просьбой предоставить `cookie.txt`.  
+Токен `Participant` нужно поместить в volume вручную:
+
+```bash
+# Узнайте имя volume
+docker volume inspect egestatbot_egestatbot_data
+
+# Скопируйте cookie.txt в volume через временный контейнер
+docker run --rm -v egestatbot_egestatbot_data:/data -v "$PWD":/src alpine \
+  cp /src/cookie.txt /data/cookie.txt
+```
+
+**4. Просмотр логов:**
+
+```bash
+docker compose logs -f
+# или из файловой системы:
+cat logs/combined.log
+```
+
+**5. Остановка / перезапуск:**
+
+```bash
+docker compose down      # остановить (данные сохраняются)
+docker compose restart   # перезапустить
+```
+
+### Структура файлов Docker
+
+```text
+egestatbot/
+├── Dockerfile            # Multi-stage сборка (builder → runner)
+├── docker-compose.yml    # Оркестрация сервиса и volumes
+└── .dockerignore         # Исключения для контекста сборки
+```
+
+---
+
 ## Безопасность
 
 *   Все файлы, содержащие персональные данные и параметры доступа (`.env`, `cookie.txt`, `exams_state.json`), а также директория `logs/` внесены в исключения `.gitignore`.
