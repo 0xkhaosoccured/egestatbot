@@ -74,7 +74,7 @@ graph TD
 ### 1. Клонирование репозитория и установка зависимостей
 
 ```bash
-git clone https://github.com/ваш-username/egestatbot.git
+git clone https://github.com/itmirsx/egestatbot.git
 cd egestatbot
 npm install
 ```
