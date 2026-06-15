@@ -134,19 +134,26 @@ class App {
       // Если предметы не указаны — авто-определение из API
       if (this.config.monitorSubjects.length === 0) {
         const available = extractSubjects(currentExams);
-        console.log('\n📚 Найдены предметы в твоём личном кабинете:');
-        available.forEach((s, i) => console.log(`  ${i + 1}. ${s}`));
-        console.log('');
-        const answer = await ask('Введи номера предметов для отслеживания (через запятую, или Enter = все): ');
-        let selected: string[];
-        if (answer.trim()) {
-          const indices = answer.split(',').map(s => parseInt(s.trim(), 10) - 1).filter(i => i >= 0 && i < available.length);
-          selected = indices.map(i => available[i]);
+
+        if (!process.stdin.isTTY) {
+          // Docker / CI — интерактивный ввод невозможен, берём все предметы автоматически
+          this.config.monitorSubjects.push(...available);
+          this.logger.info(`Авто-определение предметов (non-TTY): ${available.join(', ')}`);
         } else {
-          selected = [...available];
+          console.log('\n📚 Найдены предметы в твоём личном кабинете:');
+          available.forEach((s, i) => console.log(`  ${i + 1}. ${s}`));
+          console.log('');
+          const answer = await ask('Введи номера предметов для отслеживания (через запятую, или Enter = все): ');
+          let selected: string[];
+          if (answer.trim()) {
+            const indices = answer.split(',').map(s => parseInt(s.trim(), 10) - 1).filter(i => i >= 0 && i < available.length);
+            selected = indices.map(i => available[i]);
+          } else {
+            selected = [...available];
+          }
+          this.config.monitorSubjects.push(...selected);
+          this.logger.info(`Авто-определение предметов: ${selected.join(', ')}`);
         }
-        this.config.monitorSubjects.push(...selected);
-        this.logger.info(`Авто-определение предметов: ${selected.join(', ')}`);
       }
 
       for (const exam of currentExams) {
