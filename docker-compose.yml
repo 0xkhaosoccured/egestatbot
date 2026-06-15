@@ -20,6 +20,8 @@ services:
       - egestatbot_data:/data
       # Логи доступны снаружи контейнера
       - ./logs:/app/logs
+      # Монтируем .env в контейнер, чтобы fs.existsSync('.env') не запускал setup-мастер
+      - ./.env:/app/.env:ro
 
 volumes:
   egestatbot_data:
