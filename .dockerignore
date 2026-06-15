@@ -1,0 +1,20 @@
+# Зависимости и сборка
+node_modules/
+dist/
+
+# Среда и секреты
+.env
+.env.*
+cookie.txt
+cookie.txt.*
+
+# Данные и логи
+exams_state.json
+logs/
+*.log
+
+# Системные файлы
+.git/
+.gitignore
+*.md
+tests/
