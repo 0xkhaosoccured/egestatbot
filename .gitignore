@@ -1,0 +1,9 @@
+node_modules/
+dist/
+logs/
+*.log
+.env
+.env.*
+cookie.txt
+cookie.txt.*
+exams_state.json

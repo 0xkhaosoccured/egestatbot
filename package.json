@@ -1,0 +1,25 @@
+{
+  "name": "egestatbot",
+  "version": "1.1.0",
+  "description": "Бот для мониторинга результатов ЕГЭ. Следит за появлением баллов на checkege.rustest.ru и присылает уведомления в Telegram.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsx src/index.ts",
+    "setup": "npx tsx -e \"require('./src/setup').runSetup()\"",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "tsx": "^4.22.4",
+    "vitest": "^1.6.0",
+    "typescript": "^5.4.5"
+  }
+}
