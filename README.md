@@ -186,57 +186,78 @@ pm2 save
 
 ### Быстрый старт
 
-**1. Подготовьте `.env`:**
+**1. Клонируй репозиторий:**
 
 ```bash
-# Скопируйте пример и заполните BOT_TOKEN и ADMIN_CHAT_ID
+git clone https://github.com/itmirsx/egestatbot.git
+cd egestatbot
+```
+
+**2. Создай `.env`** из шаблона и заполни обязательные поля:
+
+```bash
 cp .env.example .env
 ```
 
-Если `.env.example` отсутствует, создайте `.env` вручную:
-
 ```env
-BOT_TOKEN=ваш_токен_бота
-ADMIN_CHAT_ID=ваш_telegram_id
-# GROUP_CHAT_IDS=id1,id2   # опционально
+BOT_TOKEN=123456789:AAFfake_token_example   # токен от @BotFather
+ADMIN_CHAT_ID=123456789                     # твой Telegram ID от @userinfobot
 ```
 
-**2. Запустите контейнер:**
+**3. Напиши `/start` своему боту в Telegram** — это обязательно, иначе бот не сможет отправить первое сообщение.
+
+**4. Запусти контейнер:**
 
 ```bash
 docker compose up -d
 ```
 
-Образ собирается автоматически при первом запуске.
+Образ собирается автоматически при первом запуске (~1-2 минуты).
 
-**3. Авторизация на портале (cookie):**
+**5. Авторизация на портале (cookie):**
 
-После первого запуска бот пришлёт уведомление в Telegram с просьбой предоставить `cookie.txt`.  
-Токен `Participant` нужно поместить в volume вручную:
+Бот пришлёт уведомление в Telegram с просьбой предоставить `cookie.txt`.
+
+1. Открой [https://checkege.rustest.ru/exams](https://checkege.rustest.ru/exams) и авторизуйся
+2. Открой DevTools (F12) → Application → Cookies → скопируй значение куки **`Participant`**
+3. Помести токен в volume:
 
 ```bash
-# Узнайте имя volume
-docker volume inspect egestatbot_egestatbot_data
+# Linux / macOS
+echo "ВСТАВЬ_ЗНАЧЕНИЕ_КУКИ" > cookie.txt
+docker run --rm \
+  -v egestatbot_egestatbot_data:/data \
+  -v "$(pwd)":/src alpine \
+  cp /src/cookie.txt /data/cookie.txt
 
-# Скопируйте cookie.txt в volume через временный контейнер
-docker run --rm -v egestatbot_egestatbot_data:/data -v "$PWD":/src alpine \
+# Windows (PowerShell)
+"ВСТАВЬ_ЗНАЧЕНИЕ_КУКИ" | Out-File -Encoding ascii cookie.txt
+docker run --rm `
+  -v egestatbot_egestatbot_data:/data `
+  -v "${PWD}:/src" alpine `
   cp /src/cookie.txt /data/cookie.txt
 ```
 
-**4. Просмотр логов:**
+Бот подхватит куку автоматически и начнёт мониторинг.
+
+**6. Просмотр логов:**
 
 ```bash
 docker compose logs -f
-# или из файловой системы:
-cat logs/combined.log
 ```
 
-**5. Остановка / перезапуск:**
+**7. Остановка / перезапуск:**
 
 ```bash
 docker compose down      # остановить (данные сохраняются)
 docker compose restart   # перезапустить
 ```
+
+> [!NOTE]
+> В Docker все предметы из личного кабинета отслеживаются автоматически. Чтобы ограничить список, задай переменную `MONITOR_SUBJECTS` в `.env`:
+> ```env
+> MONITOR_SUBJECTS=Русский язык,Информатика (КЕГЭ)
+> ```
 
 ### Структура файлов Docker
 
@@ -244,7 +265,8 @@ docker compose restart   # перезапустить
 egestatbot/
 ├── Dockerfile            # Multi-stage сборка (builder → runner)
 ├── docker-compose.yml    # Оркестрация сервиса и volumes
-└── .dockerignore         # Исключения для контекста сборки
+├── .dockerignore         # Исключения для контекста сборки
+└── .env.example          # Шаблон переменных окружения
 ```
 
 ---
